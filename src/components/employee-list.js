@@ -35,6 +35,13 @@ export default class EmployeeList extends LitElement {
       border: 0px;
       background: lightblue;
     }
+    .add-employee-btn {
+      padding: 5px 20px;
+      background: lightblue;
+      border-radius: 4px;
+      border-width: 1px;
+      font-weight: bold;
+    }
     table {
       font-family: arial, sans-serif;
       border-collapse: collapse;
@@ -68,7 +75,6 @@ export default class EmployeeList extends LitElement {
     colors: { type: Array },
     inputValue: { type: String },
     filteredData: { type: Array },
-    modalClosed: { type: Boolean },
   };
 
   constructor() {
@@ -81,10 +87,6 @@ export default class EmployeeList extends LitElement {
     });
     console.log("Inside the constructor");
   }
-
-  updateGlobalState(property) {
-    console.log("Employeedata enter into employeelist", property);
-  }
   navigateToViewEmployee(event, id) {
     event.preventDefault();
     Router.go(`/employee/${id}`);
@@ -95,9 +97,8 @@ export default class EmployeeList extends LitElement {
     const filteredEmployees = this.data.filter((item) => item.id !== id);
     this.data = filteredEmployees;
     const child = this.shadowRoot.querySelector("modal-element");
-    const element = child.getElementsByClassName("close");
-    element.addEventListener("click", this.closeModal);
-   
+    child.closeModal();
+    this.requestUpdate();
   }
 
   _handleInput(event) {
@@ -138,6 +139,13 @@ export default class EmployeeList extends LitElement {
             view all
           </button>
         </div>
+        <div
+          style="display:flex;justify-content:flex-end;margin-right:20px;margin-bottom:10px"
+        >
+          <a href="/add_employee">
+            <button class="add-employee-btn">Add Employee</button>
+          </a>
+        </div>
         <div class="emp-table">
           <table>
             <thead>
@@ -168,7 +176,6 @@ export default class EmployeeList extends LitElement {
                     </button>
                     <modal-element
                       .user="${user.name}"
-                      .modalClosed="${this.modalClosed}"
                       .deteteUser="${(event) =>
                         this.deleteEmployee(event, user.id)}"
                     ></modal-element>

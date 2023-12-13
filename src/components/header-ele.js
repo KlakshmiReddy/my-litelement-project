@@ -10,17 +10,13 @@ export class HeaderEle extends LitElement {
       align-items: center;
       background: lightgreen;
     }
-    .add-employee-btn {
-      padding: 5px 20px;
-      background: lightblue;
-      border-radius: 4px;
-      border-width: 1px;
-      font-weight: bold;
-    }
     .deloitte-img {
       width: 200px;
       height: 40px;
       object-fit: contain;
+    }
+    .logout-emp > a {
+      text-decoration: none;
     }
   `;
 
@@ -45,10 +41,8 @@ export class HeaderEle extends LitElement {
             />
           </a>
         </div>
-        <div>
-          <a href="/add_employee">
-            <button class="add-employee-btn">Add Employee</button>
-          </a>
+        <div class="logout-emp">
+          <a href="#"> Logout </a>
         </div>
       </div>
     `;

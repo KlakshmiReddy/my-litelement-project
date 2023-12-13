@@ -69,7 +69,6 @@ export default class ModalElement extends LitElement {
       isOpen: { type: Boolean },
       user: { type: String },
       deteteUser: { type: Function },
-      modalClosed: { type: Boolean },
     };
   }
   constructor() {
@@ -81,13 +80,9 @@ export default class ModalElement extends LitElement {
     this.isOpen = true;
     this.requestUpdate();
   }
-  closeModal() {
+  closeModal(event) {
+    event.preventDefault();
     this.isOpen = false;
-  }
-  updated(changedProperty) {
-    if (changedProperty.has("modalClosed")) {
-      this.closeModal();
-    }
   }
   render() {
     const content = this.isOpen
