@@ -2,6 +2,7 @@ import { html, css, LitElement } from "lit";
 import "./header-ele.js";
 import { Router } from "@vaadin/router";
 import ModalElement from "./modal-element.js";
+
 const fetchData = async () => {
   try {
     const response = await fetch("https://jsonplaceholder.typicode.com/users");
@@ -35,13 +36,6 @@ export default class EmployeeList extends LitElement {
       border: 0px;
       background: lightblue;
     }
-    .add-employee-btn {
-      padding: 5px 20px;
-      background: lightblue;
-      border-radius: 4px;
-      border-width: 1px;
-      font-weight: bold;
-    }
     table {
       font-family: arial, sans-serif;
       border-collapse: collapse;
@@ -58,7 +52,21 @@ export default class EmployeeList extends LitElement {
     tr:nth-child(even) {
       background-color: #dddddd;
     }
-    .emp-table {
+    .add-employee-btn {
+      padding: 5px 20px;
+      background: lightblue;
+      border-radius: 4px;
+      border-width: 1px;
+      font-weight: bold;
+    }
+    .danger-btn {
+      background-color: rgb(219 76 76 / 96%);
+      font-size: 14px;
+      color: rgb(255, 255, 255);
+      padding: 4px 10px;
+      border-width: 0px;
+      cursor: pointer;
+      border-radius: 3px;
     }
     .add-employee-btn {
       padding: 5px 20px;
@@ -72,21 +80,23 @@ export default class EmployeeList extends LitElement {
   static properties = {
     name: { type: String },
     data: { type: Array },
-    colors: { type: Array },
     inputValue: { type: String },
     filteredData: { type: Array },
+    isOpen: { type: Boolean },
+    userId: { type: Number },
   };
 
   constructor() {
     super();
     this.name = "Header";
     this.inputValue = "";
-    this.modalClosed = false;
+    this.isOpen = false;
     fetchData().then((res) => {
       this.data = res;
     });
     console.log("Inside the constructor");
   }
+
   navigateToViewEmployee(event, id) {
     event.preventDefault();
     Router.go(`/employee/${id}`);
@@ -96,9 +106,7 @@ export default class EmployeeList extends LitElement {
     event.preventDefault();
     const filteredEmployees = this.data.filter((item) => item.id !== id);
     this.data = filteredEmployees;
-    const child = this.shadowRoot.querySelector("modal-element");
-    child.closeModal();
-    this.requestUpdate();
+    this.isOpen = false;
   }
 
   _handleInput(event) {
@@ -115,6 +123,14 @@ export default class EmployeeList extends LitElement {
     fetchData().then((res) => {
       this.data = res;
     });
+  }
+  openModel(id) {
+    this.userId = id;
+    this.isOpen = true;
+  }
+  closeModal() {
+    console.log("Close Modal");
+    this.isOpen = false;
   }
   render() {
     return html`
@@ -139,14 +155,14 @@ export default class EmployeeList extends LitElement {
             view all
           </button>
         </div>
-        <div
-          style="display:flex;justify-content:flex-end;margin-right:20px;margin-bottom:10px"
-        >
-          <a href="/add_employee">
-            <button class="add-employee-btn">Add Employee</button>
-          </a>
-        </div>
         <div class="emp-table">
+          <div
+            style="display:flex;justify-content:flex-end;margin-right:10px;margin-bottom:10px"
+          >
+            <a href="/add_employee">
+              <button class="add-employee-btn">Add Employee</button>
+            </a>
+          </div>
           <table>
             <thead>
               <tr>
@@ -174,11 +190,12 @@ export default class EmployeeList extends LitElement {
                     >
                       VIEW
                     </button>
-                    <modal-element
-                      .user="${user.name}"
-                      .deteteUser="${(event) =>
-                        this.deleteEmployee(event, user.id)}"
-                    ></modal-element>
+                    <button
+                      class="danger-btn"
+                      @click="${(event) => this.openModel(user.id)}"
+                    >
+                      delete
+                    </button>
                   </td>
                 </tr>`
               )}
@@ -186,6 +203,13 @@ export default class EmployeeList extends LitElement {
           </table>
         </div>
       </div>
+      ${this.isOpen
+        ? html`<modal-element
+            .deteteUser="${(event) => this.deleteEmployee(event, this.userId)}"
+            .closeModal="${() => this.closeModal()}"
+          >
+          </modal-element>`
+        : null}
     `;
   }
 }

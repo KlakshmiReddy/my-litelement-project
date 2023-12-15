@@ -15,7 +15,7 @@ export class HeaderEle extends LitElement {
       height: 40px;
       object-fit: contain;
     }
-    .logout-emp > a {
+    .logout > a {
       text-decoration: none;
     }
   `;
@@ -41,7 +41,7 @@ export class HeaderEle extends LitElement {
             />
           </a>
         </div>
-        <div class="logout-emp">
+        <div class="logout">
           <a href="#"> Logout </a>
         </div>
       </div>

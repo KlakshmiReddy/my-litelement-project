@@ -116,6 +116,7 @@ export default class AddEmployee extends LitElement {
             <input
               type="text"
               name="name"
+              id="empname"
               required
               .value="${this.employeeData.name}"
               @input="${(event) => this.handleFormData(event)}"

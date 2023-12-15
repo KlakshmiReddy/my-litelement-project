@@ -53,71 +53,37 @@ export default class ModalElement extends LitElement {
       cursor: pointer;
       border-radius: 3px;
     }
-    .danger-btn {
-      background-color: rgb(219 76 76 / 96%);
-      font-size: 14px;
-      color: rgb(255, 255, 255);
-      padding: 4px 10px;
-      border-width: 0px;
-      cursor: pointer;
-      border-radius: 3px;
-    }
   `;
 
   static get properties() {
     return {
-      isOpen: { type: Boolean },
-      user: { type: String },
       deteteUser: { type: Function },
+      closeModal: { type: Function },
     };
   }
   constructor() {
     super();
-    this.isOpen = false;
   }
-  openModal(event) {
-    event.preventDefault();
-    this.isOpen = true;
-    this.requestUpdate();
-  }
-  closeModal(event) {
-    event.preventDefault();
-    this.isOpen = false;
-  }
+
   render() {
-    const content = this.isOpen
-      ? html`<div class="modal">
-          <div class="modal-content">
-            <span class="close" @click="${(event) => this.closeModal(event)}">
-              &times;
-            </span>
-            <p style="margin-top:25px;">
-              Are you sure you want to delete employee ${this.user} ?
-            </p>
-            <div class="action-btn-group">
-              <button
-                class="primary-btn"
-                style="margin-right:10px;"
-                @click="${this.deteteUser}"
-              >
-                OK
-              </button>
-              <button
-                class="sec-btn"
-                @click="${(event) => this.closeModal(event)}"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>`
-      : null;
     return html`
-      <div>
-        <button class="danger-btn" @click="${(event) => this.openModal(event)}">
-          Delete
-        </button>
-        ${content}
+      <div class="modal">
+        <div class="modal-content">
+          <span class="close" @click="${this.closeModal}"> &times; </span>
+          <p style="margin-top:25px;">
+            Are you sure you want to delete employee ${this.user} ?
+          </p>
+          <div class="action-btn-group">
+            <button
+              class="primary-btn"
+              style="margin-right:10px;"
+              @click="${this.deteteUser}"
+            >
+              OK
+            </button>
+            <button class="sec-btn" @click="${this.closeModal}">Cancel</button>
+          </div>
+        </div>
       </div>
     `;
   }
