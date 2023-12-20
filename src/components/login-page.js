@@ -5,9 +5,7 @@ import { Authenticator1 } from "./authenticator1";
 export class LoginPage extends Authenticator1 {
   static styles = css`
     .add-employee-container {
-      max-width: 1000px;
-      height: 500px;
-      margin: auto auto;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -24,11 +22,19 @@ export class LoginPage extends Authenticator1 {
       font-weight: bold;
       width: 100%;
     }
+    .error-msg {
+      position: absolute;
+      font-size: 12px;
+      color: red;
+      top: 35px;
+      left: 4px;
+    }
   `;
   static properties = {
     employeeData: {
       type: Object,
     },
+    errors: { type: Object },
   };
 
   constructor() {
@@ -37,6 +43,7 @@ export class LoginPage extends Authenticator1 {
       email: "",
       password: "",
     };
+    this.errors = {};
   }
   handleFormData(event) {
     const { name, value } = event.target;
@@ -44,10 +51,17 @@ export class LoginPage extends Authenticator1 {
       ...this.employeeData,
       [name]: value,
     };
+    this.errors = {
+      ...this.errors,
+      [name]: "",
+    };
   }
   handleSubmit(event) {
     event.preventDefault();
-    if (this.employeeData.email && this.employeeData.password) {
+    const isValid = this.validateForm();
+    this.requestUpdate();
+    console.log("Before Validate", this.errors.email);
+    if (isValid) {
       // fetch("http://localhost:8080/springboot-jwt-login/login", {
       //   method: "post",
       //   headers: {
@@ -64,21 +78,39 @@ export class LoginPage extends Authenticator1 {
       Router.go("/employee");
     }
   }
+  validateForm() {
+    const { email, password } = this.employeeData;
+    switch (true) {
+      case !email:
+        this.errors.email = "Email is required";
+      case !password:
+        this.errors.password = "Password is required";
+        break;
+      default:
+        break;
+    }
+    if (!this.errors.email && !this.errors.password) {
+      return true;
+    }
+  }
 
   render() {
     return html`
       <div class="add-employee-container">
         <form class="add-employee-form">
-          <div style="margin-bottom:20px;">
+          <div style="margin-bottom:20px; position:relative">
             <input
               type="text"
               name="email"
               .value="${this.employeeData.email}"
               @input="${(event) => this.handleFormData(event)}"
-              placeholder="Enter Employee Userid"
+              placeholder="Enter Employee Email"
             />
+            ${this.errors.email
+              ? html`<span class="error-msg">${this.errors.email}</span>`
+              : ""}
           </div>
-          <div style="margin-bottom:20px;">
+          <div style="margin-bottom:20px;position:relative">
             <input
               type="password"
               name="password"
@@ -86,6 +118,9 @@ export class LoginPage extends Authenticator1 {
               @input="${(event) => this.handleFormData(event)}"
               placeholder="Enter Password"
             />
+            ${this.errors.password
+              ? html`<span class="error-msg">${this.errors.password}</span>`
+              : ""}
           </div>
           <div style="margin-bottom:20px;text-align:center;">
             <button

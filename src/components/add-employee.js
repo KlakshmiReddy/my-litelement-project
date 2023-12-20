@@ -9,9 +9,7 @@ export default class AddEmployee extends Authenticated {
       width: 180px;
     }
     .add-employee-container {
-      max-width: 1000px;
-      height: 500px;
-      margin: auto auto;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;

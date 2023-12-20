@@ -19,7 +19,7 @@ export default class EmployeeList extends Authenticated {
       border-radius: 4px;
       border-width: 1px;
       margin-right: 10px;
-      font-size: 18px;
+      font-size: 14px;
     }
     .search-field button {
       min-height: 30px;
@@ -133,7 +133,7 @@ export default class EmployeeList extends Authenticated {
     this.data = [...this.filteredData];
   }
   _viewAllData() {
-    fetchData().then((res) => {
+    this.fetchData().then((res) => {
       this.data = res;
     });
   }
