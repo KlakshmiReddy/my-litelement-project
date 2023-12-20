@@ -1,7 +1,8 @@
 import { html, css, LitElement } from "lit";
 import { Router } from "@vaadin/router";
+import { Authenticated } from "./authentication.js";
 
-export default class EmployeeView extends LitElement {
+export default class EmployeeView extends Authenticated {
   static styles = css`
     .label-item {
       display: block;
@@ -39,7 +40,7 @@ export default class EmployeeView extends LitElement {
     super();
     this.isLoading = true;
     this.routeParams = {};
-    console.log(window.location.href);
+    this.employeeData = [];
   }
 
   firstUpdated() {
@@ -51,7 +52,6 @@ export default class EmployeeView extends LitElement {
         .then((res) => res.json())
         .then((data) => {
           this.employeeData = [data];
-          console.log("data", this.employeeData);
         });
       this.isLoading = false;
     } catch (e) {
@@ -65,30 +65,30 @@ export default class EmployeeView extends LitElement {
   }
 
   render() {
-    const content = this.isLoading
-      ? html`<p>Loading....</p>`
-      : html`${this.employeeData?.map((user) => {
-          return html`
+    return html`<div class="add-employee-container">
+      ${this.isLoading
+        ? html`<p style="text-align:center">Loading.....</p>`
+        : html`
             <form class="add-employee-form">
               <div style="margin-bottom:10px">
                 <label class="label-item">Name : </label>
-                <p>${user.name}</p>
+                <p>${this.employeeData[0].name}</p>
               </div>
               <div style="margin-bottom:10px">
                 <label class="label-item">User Name : </label>
-                <p>${user.username}</p>
+                <p>${this.employeeData[0].username}</p>
               </div>
               <div style="margin-bottom:10px">
                 <label class="label-item">Email : </label>
-                <p>${user.email}</p>
+                <p>${this.employeeData[0].email}</p>
               </div>
               <div style="margin-bottom:10px">
                 <label class="label-item">Phone Number : </label>
-                <p>${user.phone}</p>
+                <p>${this.employeeData[0].phone}</p>
               </div>
               <div style="margin-bottom:10px">
                 <label class="label-item">Website : </label>
-                <p>${user.website}</p>
+                <p>${this.employeeData[0].website}</p>
               </div>
               <div style="margin-bottom:10px; text-align:center;">
                 <button
@@ -99,9 +99,9 @@ export default class EmployeeView extends LitElement {
                 </button>
               </div>
             </form>
-          `;
-        })}`;
-    return html`<div class="add-employee-container">${content}</div> `;
+            <div
+          `}
+    </div> `;
   }
 }
 customElements.define("employee-view", EmployeeView);

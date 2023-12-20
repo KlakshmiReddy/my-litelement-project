@@ -23,10 +23,29 @@ class LitRealWorldIndex extends LitElement {
   firstUpdated() {
     console.log("Inside the firstupdated Main page Loading.....");
     super.firstUpdated();
-
     const router = new Router(this.shadowRoot.querySelector("#outlet"));
     router.setRoutes([
-      { path: "/employee", component: "employee-list" },
+      {
+        path: "/",
+        component: "login-page",
+        action: async () => {
+          await import("./src/components/login-page.js");
+        },
+      },
+      {
+        path: "/login",
+        component: "login-page",
+        action: async () => {
+          await import("./src/components/login-page.js");
+        },
+      },
+      {
+        path: "/employee",
+        component: "employee-list",
+        action: async () => {
+          await import("./src/components/employee-list.js");
+        },
+      },
       { path: `/employee/:userId`, component: "employee-view" },
       { path: "/add_employee", component: "add-employee" },
       { path: "/practice", component: "life-cycle-methods" },

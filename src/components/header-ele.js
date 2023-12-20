@@ -28,7 +28,10 @@ export class HeaderEle extends LitElement {
     super();
     this.name = "Header";
   }
-
+  logoutFn() {
+    localStorage.removeItem("token");
+    window.location.reload();
+  }
   render() {
     return html`
       <div class="header-container">
@@ -42,7 +45,7 @@ export class HeaderEle extends LitElement {
           </a>
         </div>
         <div class="logout">
-          <a href="#"> Logout </a>
+          <a href="#" @click="${this.logoutFn}"> Logout </a>
         </div>
       </div>
     `;

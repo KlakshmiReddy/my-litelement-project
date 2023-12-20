@@ -1,7 +1,8 @@
 import { html, css, LitElement } from "lit";
 import { Router } from "@vaadin/router";
 import EmployeeList from "./employee-list.js";
-export default class AddEmployee extends LitElement {
+import { Authenticated } from "./authentication.js";
+export default class AddEmployee extends Authenticated {
   static styles = css`
     .label-item {
       display: block;
@@ -42,8 +43,10 @@ export default class AddEmployee extends LitElement {
   static get properties() {
     return {
       name: { type: String },
+      description: { type: String },
       errors: { type: Object },
       employeeData: { type: Object },
+      instance: { type: Object },
       state: { type: Boolean },
     };
   }
@@ -51,6 +54,7 @@ export default class AddEmployee extends LitElement {
   constructor() {
     super();
     this.state = false;
+    this.description = "";
     this.employeeData = {
       name: "",
       username: "",
@@ -59,6 +63,7 @@ export default class AddEmployee extends LitElement {
       website: "",
     };
     this.errors = {};
+    this.instance = new EmployeeList();
   }
   handleFormData(event) {
     const { name, value } = event.target;
@@ -71,6 +76,14 @@ export default class AddEmployee extends LitElement {
       [name]: "",
     };
   }
+  handleTextarea(event) {
+    const textarea = event.target;
+    const maxLength = 5;
+    if (textarea.value.length > maxLength) {
+      textarea.value = textarea.value.slice(0, maxLength);
+    }
+    this.description = textarea.value;
+  }
 
   handleSubmit(event) {
     event.preventDefault();
@@ -78,9 +91,9 @@ export default class AddEmployee extends LitElement {
     this.requestUpdate();
     if (isValid) {
       console.log(this.employeeData);
-      // Router.go("/employee");
+      this.instance.addData(this.employeeData);
+      window.history.back();
     }
-    this.render();
   }
   navigateToEmployeeList(event) {
     event.preventDefault();
@@ -110,13 +123,14 @@ export default class AddEmployee extends LitElement {
       <div class="add-employee-container">
         <form class="add-employee-form">
           <div style="margin-bottom:20px;position:relative">
-            <label class="label-item"
-              >Name <span style="color:red">*</span></label
-            >
+            <label class="label-item">
+              <span id="fname">Name</span>
+              <span style="color:red">*</span>
+            </label>
             <input
               type="text"
               name="name"
-              id="empname"
+              id="input-field1"
               required
               .value="${this.employeeData.name}"
               @input="${(event) => this.handleFormData(event)}"
@@ -128,12 +142,14 @@ export default class AddEmployee extends LitElement {
           </div>
 
           <div style="margin-bottom:20px;position:relative">
-            <label class="label-item"
-              >User Name <span style="color:red">*</span></label
+            <label class="label-item">
+              <span id="username">User Name</span>
+              <span style="color:red">*</span></label
             >
             <input
               type="text"
               name="username"
+              id="input-field2"
               required
               .value="${this.employeeData.username}"
               @input="${(event) => this.handleFormData(event)}"
@@ -144,12 +160,14 @@ export default class AddEmployee extends LitElement {
               : ""}
           </div>
           <div style="margin-bottom:20px;position:relative">
-            <label class="label-item"
-              >Email <span style="color:red">*</span></label
+            <label class="label-item">
+              <span id="email">Email</span>
+              <span style="color:red">*</span></label
             >
             <input
               type="text"
               name="email"
+              id="input-field3"
               required
               .value="${this.employeeData.email}"
               @input="${(event) => this.handleFormData(event)}"
@@ -160,9 +178,10 @@ export default class AddEmployee extends LitElement {
               : ""}
           </div>
           <div style="margin-bottom:20px">
-            <label class="label-item">Phone Number : </label>
+            <label class="label-item" id="phone">Phone Number</label>
             <input
               type="text"
+              id="input-field4"
               name="phone"
               .value="${this.employeeData.phone}"
               @input="${(event) => this.handleFormData(event)}"
@@ -170,31 +189,33 @@ export default class AddEmployee extends LitElement {
             />
           </div>
           <div style="margin-bottom:20px">
-            <label class="label-item">Website : </label>
+            <label class="label-item" id="website">Website</label>
             <input
               type="text"
               name="website"
+              id="input-field5"
               .value="${this.employeeData.website}"
               @input="${(event) => this.handleFormData(event)}"
               placeholder="Enter Website"
             />
           </div>
-          <div style="margin-bottom:20px; text-align:center;">
+          <div style="margin-bottom:20px;">
             <button
               class="add-employee-btn"
+              id="add-btn"
               @click="${(event) => this.handleSubmit(event)}"
             >
               Add Employee
             </button>
             <button
               class="add-employee-btn"
+              id="go-back"
               style="margin-left:10px;"
               @click="${(event) => this.navigateToEmployeeList(event)}"
             >
               Go Back
             </button>
           </div>
-          <div style="margin-bottom:20px"></div>
         </form>
       </div>
     `;
