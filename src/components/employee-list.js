@@ -1,5 +1,5 @@
 import { html, css, LitElement } from "lit";
-import "./header-ele.js";
+import { Pagination } from "./pagination-component.js";
 import { Router } from "@vaadin/router";
 import ModalElement from "./modal-element.js";
 import { Authenticated } from "./authentication.js";
@@ -72,6 +72,7 @@ export default class EmployeeList extends Authenticated {
     return {
       name: { type: String },
       data: { type: Array },
+      currentData: { type: Array },
       inputValue: { type: String },
       filteredData: { type: Array },
       isOpen: { type: Boolean },
@@ -86,24 +87,36 @@ export default class EmployeeList extends Authenticated {
     this.inputValue = "";
     this.isOpen = false;
     this.isLoading = true;
-    this.fetchData().then((res) => {
-      this.data = res;
-    });
-    console.log("Inside the constructor");
+    this.currentData = [];
+    this.data = [];
+    this.fetchData();
+    this.currentPage = 1;
+    this.postsPerPage = 5;
   }
   fetchData = async () => {
+    console.log("api call in-progress");
     try {
       const response = await fetch(
         "https://jsonplaceholder.typicode.com/users"
       );
       const json = await response.json();
-      await new Promise((r) => setTimeout(() => r(), 1000));
+      this.data = json;
       this.isLoading = false;
-      return json;
     } catch (e) {
       console.log(e);
     }
+    console.log("api call done");
   };
+  updated(changedProperties) {
+    if (changedProperties.has("data")) {
+      this.lastIndex = this.currentPage * this.postsPerPage;
+      this.firstIndex = this.lastIndex - this.postsPerPage;
+      this.currentData = this.data?.slice(this.firstIndex, this.lastIndex);
+    }
+    if (changedProperties.has("currentPage")) {
+      console.log("Updated2");
+    }
+  }
   navigateToViewEmployee(event, id) {
     event.preventDefault();
     Router.go(`/employee/${id}`);
@@ -130,11 +143,11 @@ export default class EmployeeList extends Authenticated {
     this.filteredData = this.data.filter((item) =>
       item.name.toLowerCase().includes(this.inputValue.toLowerCase())
     );
-    this.data = [...this.filteredData];
+    this.currentData = [...this.filteredData];
   }
   _viewAllData() {
     this.fetchData().then((res) => {
-      this.data = res;
+      this.currentData = res;
     });
   }
   openModel(id) {
@@ -145,7 +158,15 @@ export default class EmployeeList extends Authenticated {
     console.log("Close Modal");
     this.isOpen = false;
   }
+  changeCurrentPage = (event) => {
+    const eventData = event.detail;
+    this.currentPage = eventData;
+    this.lastIndex = this.currentPage * this.postsPerPage;
+    this.firstIndex = this.lastIndex - this.postsPerPage;
+    this.currentData = this.data?.slice(this.firstIndex, this.lastIndex);
+  };
   render() {
+    console.log("Render method called");
     return html`
       <header-element></header-element>
       <div class="employee-container">
@@ -182,16 +203,16 @@ export default class EmployeeList extends Authenticated {
                 <table>
                   <thead>
                     <tr>
-                      <th>Name</th>
-                      <th>User Name</th>
-                      <th>Email</th>
-                      <th>Phone</th>
-                      <th>Website</th>
+                      <th style="width:16%">Name</th>
+                      <th style="width:16%">User Name</th>
+                      <th style="width:16%">Email</th>
+                      <th style="width:16%">Phone</th>
+                      <th style="width:16%">Website</th>
                       <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    ${this.data.map(
+                    ${this.currentData?.map(
                       (user) => html` <tr>
                         <td>${user.name}</td>
                         <td>${user.username}</td>
@@ -220,6 +241,13 @@ export default class EmployeeList extends Authenticated {
               </div>
             `}
       </div>
+      <div style="text-align:center">
+        <pagination-component
+          .empdata=${this.data}
+          @child-event="${this.changeCurrentPage}"
+        ></pagination-component>
+      </div>
+
       ${this.isOpen
         ? html`<modal-element
             .deteteUser="${(event) => this.deleteEmployee(event, this.userId)}"

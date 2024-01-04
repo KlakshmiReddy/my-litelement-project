@@ -5,7 +5,7 @@ import EmployeeView from "./src/components/employee-view.js";
 import AddEmployee from "./src/components/add-employee.js";
 import ModalElement from "./src/components/modal-element.js";
 import { LifeCycleMethods } from "./src/lifecycle_methods/life-cycle-methods.js";
-
+import "./src/components/header-ele.js";
 class LitRealWorldIndex extends LitElement {
   static get properties() {
     return {
@@ -46,7 +46,13 @@ class LitRealWorldIndex extends LitElement {
           await import("./src/components/employee-list.js");
         },
       },
-      { path: `/employee/:userId`, component: "employee-view" },
+      {
+        path: `/employee/:userId`,
+        component: "employee-view",
+        action: async () => {
+          await import("./src/components/employee-view.js");
+        },
+      },
       { path: "/add_employee", component: "add-employee" },
       { path: "/practice", component: "life-cycle-methods" },
     ]);

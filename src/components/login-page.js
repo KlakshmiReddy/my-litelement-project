@@ -14,6 +14,7 @@ export class LoginPage extends Authenticator1 {
       height: 20px;
       width: 200px;
       padding: 5px 10px;
+      border: 1px solid #000;
     }
     .add-employee-btn {
       padding: 10px 20px;
@@ -28,6 +29,12 @@ export class LoginPage extends Authenticator1 {
       color: red;
       top: 35px;
       left: 4px;
+    }
+    .border-red {
+      border: 1px solid red !important;
+    }
+    input:focus-visible {
+      outline: none;
     }
   `;
   static properties = {
@@ -101,7 +108,9 @@ export class LoginPage extends Authenticator1 {
           <div style="margin-bottom:20px; position:relative">
             <input
               type="text"
+              class=${this.errors.email ? "border-red" : ""}
               name="email"
+              id="input-field1"
               .value="${this.employeeData.email}"
               @input="${(event) => this.handleFormData(event)}"
               placeholder="Enter Employee Email"
@@ -114,6 +123,8 @@ export class LoginPage extends Authenticator1 {
             <input
               type="password"
               name="password"
+              id="input-field2"
+              class=${this.errors.password ? "border-red" : ""}
               .value="${this.employeeData.password}"
               @input="${(event) => this.handleFormData(event)}"
               placeholder="Enter Password"
@@ -122,8 +133,9 @@ export class LoginPage extends Authenticator1 {
               ? html`<span class="error-msg">${this.errors.password}</span>`
               : ""}
           </div>
-          <div style="margin-bottom:20px;text-align:center;">
+          <div style="margin-top:30px;">
             <button
+              id="login-btn"
               class="add-employee-btn"
               @click="${(event) => this.handleSubmit(event)}"
             >

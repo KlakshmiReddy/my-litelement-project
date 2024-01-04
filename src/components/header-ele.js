@@ -1,5 +1,4 @@
 import { html, css, LitElement } from "lit";
-import page from "page";
 export class HeaderEle extends LitElement {
   static styles = css`
     .header-container {

@@ -12,6 +12,7 @@ export class LifeCycleMethods extends LitElement {
   constructor() {
     super();
     this.count = 0;
+   
     console.log("constructor called");
   }
   connectedCallback() {

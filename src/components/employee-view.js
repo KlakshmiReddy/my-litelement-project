@@ -63,14 +63,15 @@ export default class EmployeeView extends Authenticated {
   }
 
   render() {
-    return html`<div class="add-employee-container">
-      ${this.isLoading
-        ? html`<p style="text-align:center">Loading.....</p>`
-        : html`
+    return html`
+      <div class="add-employee-container">
+        ${this.isLoading
+          ? html`<p style="text-align:center">Loading.....</p>`
+          : html`
             <form class="add-employee-form">
               <div style="margin-bottom:10px">
-                <label class="label-item">Name : </label>
-                <p>${this.employeeData[0].name}</p>
+                <label class="label-item" id='name-label'>Name</label>
+                <p id='name-value'>${this.employeeData[0].name}</p>
               </div>
               <div style="margin-bottom:10px">
                 <label class="label-item">User Name : </label>
@@ -91,6 +92,7 @@ export default class EmployeeView extends Authenticated {
               <div style="margin-bottom:10px; text-align:center;">
                 <button
                   class="add-employee-btn"
+                  id='go-back'
                   @click="${(event) => this.navigateToEmployeeList(event)}"
                 >
                   Back
@@ -99,7 +101,8 @@ export default class EmployeeView extends Authenticated {
             </form>
             <div
           `}
-    </div> `;
+      </div>
+    `;
   }
 }
 customElements.define("employee-view", EmployeeView);
