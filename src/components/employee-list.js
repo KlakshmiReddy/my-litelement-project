@@ -94,18 +94,14 @@ export default class EmployeeList extends Authenticated {
     this.postsPerPage = 5;
   }
   fetchData = async () => {
-    console.log("api call in-progress");
     try {
-      const response = await fetch(
-        "https://jsonplaceholder.typicode.com/users"
-      );
+      const response = await fetch("http://localhost:3000/users");
       const json = await response.json();
       this.data = json;
       this.isLoading = false;
     } catch (e) {
       console.log(e);
     }
-    console.log("api call done");
   };
   updated(changedProperties) {
     if (changedProperties.has("data")) {
@@ -113,27 +109,29 @@ export default class EmployeeList extends Authenticated {
       this.firstIndex = this.lastIndex - this.postsPerPage;
       this.currentData = this.data?.slice(this.firstIndex, this.lastIndex);
     }
-    if (changedProperties.has("currentPage")) {
-      console.log("Updated2");
-    }
   }
   navigateToViewEmployee(event, id) {
     event.preventDefault();
     Router.go(`/employee/${id}`);
   }
-  addData(item) {
-    console.log("From child", item);
-    this.data.push({ id: this.data.length + 1, ...item });
-    this.data = [...this.data];
-    console.log("From child", this.data);
-  }
 
-  deleteEmployee(event, id) {
+  deleteEmployee = async (event, id) => {
     event.preventDefault();
-    const filteredEmployees = this.data.filter((item) => item.id !== id);
-    this.data = filteredEmployees;
+    try {
+      const response = await fetch(`http://localhost:3000/users/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      });
+      if (response.ok) {
+        window.location.reload();
+      }
+    } catch (e) {
+      console.log(e);
+    }
     this.isOpen = false;
-  }
+  };
 
   _handleInput(event) {
     this.inputValue = event.target.value;
@@ -143,12 +141,7 @@ export default class EmployeeList extends Authenticated {
     this.filteredData = this.data.filter((item) =>
       item.name.toLowerCase().includes(this.inputValue.toLowerCase())
     );
-    this.currentData = [...this.filteredData];
-  }
-  _viewAllData() {
-    this.fetchData().then((res) => {
-      this.currentData = res;
-    });
+    this.data = [...this.filteredData];
   }
   openModel(id) {
     this.userId = id;
@@ -168,7 +161,6 @@ export default class EmployeeList extends Authenticated {
   render() {
     console.log("Render method called");
     return html`
-      <header-element></header-element>
       <div class="employee-container">
         <div class="search-field">
           <input
@@ -180,13 +172,6 @@ export default class EmployeeList extends Authenticated {
           />
           <button @click="${this._filterData}" class="add-employee-btn">
             Search
-          </button>
-          <button
-            @click="${this._viewAllData}"
-            style="margin-left:10px"
-            class="add-employee-btn"
-          >
-            view all
           </button>
         </div>
         ${this.isLoading

@@ -9,7 +9,7 @@ export default class EmployeeView extends Authenticated {
       width: 180px;
     }
     .add-employee-container {
-      height: 100vh;
+      padding-top: 50px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -17,6 +17,9 @@ export default class EmployeeView extends Authenticated {
     .add-employee-form div {
       display: flex;
       align-items: center;
+    }
+    .add-employee-form p {
+      margin: 0px;
     }
     .add-employee-btn {
       padding: 10px 20px;
@@ -46,7 +49,7 @@ export default class EmployeeView extends Authenticated {
     this.routeParams = this.location.params;
     this.id = this.routeParams.userId;
     try {
-      fetch(`https://jsonplaceholder.typicode.com/users/${this.id}`)
+      fetch(`http://localhost:3000/users/${this.id}`)
         .then((res) => res.json())
         .then((data) => {
           this.employeeData = [data];

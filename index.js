@@ -1,6 +1,7 @@
 import { LitElement, html, css } from "lit";
 import { Router } from "@vaadin/router";
 import EmployeeList from "./src/components/employee-list.js";
+import EmployeeList1 from "./src/components/search-employee.js";
 import EmployeeView from "./src/components/employee-view.js";
 import AddEmployee from "./src/components/add-employee.js";
 import ModalElement from "./src/components/modal-element.js";
@@ -10,6 +11,7 @@ class LitRealWorldIndex extends LitElement {
   static get properties() {
     return {
       userId: { type: String },
+      headerAccess: { type: String },
       routeParams: { type: Object },
     };
   }
@@ -17,11 +19,9 @@ class LitRealWorldIndex extends LitElement {
     super();
     this.userId = "";
     this.routeParams = {};
-    console.log("Inside the constructor Main page Loading.....");
+    this.headerAccess = "";
   }
-
   firstUpdated() {
-    console.log("Inside the firstupdated Main page Loading.....");
     super.firstUpdated();
     const router = new Router(this.shadowRoot.querySelector("#outlet"));
     router.setRoutes([
@@ -29,6 +29,7 @@ class LitRealWorldIndex extends LitElement {
         path: "/",
         component: "login-page",
         action: async () => {
+          this.headerAccess = false;
           await import("./src/components/login-page.js");
         },
       },
@@ -36,6 +37,7 @@ class LitRealWorldIndex extends LitElement {
         path: "/login",
         component: "login-page",
         action: async () => {
+          this.headerAccess = false;
           await import("./src/components/login-page.js");
         },
       },
@@ -43,6 +45,7 @@ class LitRealWorldIndex extends LitElement {
         path: "/employee",
         component: "employee-list",
         action: async () => {
+          this.headerAccess = true;
           await import("./src/components/employee-list.js");
         },
       },
@@ -50,10 +53,34 @@ class LitRealWorldIndex extends LitElement {
         path: `/employee/:userId`,
         component: "employee-view",
         action: async () => {
+          this.headerAccess = true;
           await import("./src/components/employee-view.js");
         },
       },
-      { path: "/add_employee", component: "add-employee" },
+      {
+        path: "/search",
+        component: "employee-list1",
+        action: async () => {
+          this.headerAccess = true;
+          await import("./src/components/search-employee.js");
+        },
+      },
+      {
+        path: "/editemployee/:userId",
+        component: "edit-employee",
+        action: async () => {
+          this.headerAccess = true;
+          await import("./src/components/edit-employee.js");
+        },
+      },
+      {
+        path: "/add_employee",
+        component: "add-employee",
+        action: async () => {
+          this.headerAccess = true;
+          await import("./src/components/add-employee.js");
+        },
+      },
       { path: "/practice", component: "life-cycle-methods" },
     ]);
   }
@@ -61,6 +88,7 @@ class LitRealWorldIndex extends LitElement {
   render() {
     return html`
       <main>
+        ${this.headerAccess ? html`<header-element></header-element>` : html``}
         <div id="outlet"></div>
       </main>
     `;

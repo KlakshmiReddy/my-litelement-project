@@ -10,12 +10,11 @@ export class Authenticator1 extends LitElement {
   async checkTokenAndRedirect() {
     const token = this.getToken();
     if (token) {
-      Router.go("/employee");
+      Router.go("/search");
     }
   }
   getToken() {
     const token = localStorage.getItem("token");
-    console.log("Token", token);
     return token;
   }
 }

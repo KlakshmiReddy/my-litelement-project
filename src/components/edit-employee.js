@@ -2,7 +2,7 @@ import { html, css, LitElement } from "lit";
 import { Router } from "@vaadin/router";
 import EmployeeList from "./employee-list.js";
 import { Authenticated } from "./authentication.js";
-export default class AddEmployee extends Authenticated {
+export default class EditEmployee extends Authenticated {
   static styles = css`
     .label-item {
       display: block;
@@ -41,12 +41,13 @@ export default class AddEmployee extends Authenticated {
   static get properties() {
     return {
       name: { type: String },
-      listAddedMsg: { type: String },
       description: { type: String },
       errors: { type: Object },
       employeeData: { type: Object },
       instance: { type: Object },
       state: { type: Boolean },
+      routeParams: { type: Object },
+      id: { type: Number },
     };
   }
 
@@ -62,8 +63,27 @@ export default class AddEmployee extends Authenticated {
       website: "",
     };
     this.errors = {};
-    this.listAddedMsg = "";
+    this.routeParams = {};
   }
+  updated(changedProperties) {
+    if (changedProperties.has("routeParams")) {
+      this.routeParams = this.location.params;
+      this.id = this.routeParams.userId;
+      this.getUpdatedEmployee(this.id);
+    }
+  }
+  getUpdatedEmployee(id) {
+    try {
+      fetch(`http://localhost:3000/users/${id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          this.employeeData = data;
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   handleFormData(event) {
     const { name, value } = event.target;
     this.employeeData = {
@@ -75,38 +95,24 @@ export default class AddEmployee extends Authenticated {
       [name]: "",
     };
   }
-  handleTextarea(event) {
-    const textarea = event.target;
-    const maxLength = 5;
-    if (textarea.value.length > maxLength) {
-      textarea.value = textarea.value.slice(0, maxLength);
-    }
-    this.description = textarea.value;
-  }
 
-  handleSubmit = async (event) => {
+  handleSave = async (event) => {
     event.preventDefault();
     const isValid = this.validateForm();
     this.requestUpdate();
     if (isValid) {
       try {
-        const response = await fetch("http://localhost:3000/users", {
-          method: "POST",
+        const response = await fetch(`http://localhost:3000/users/${this.id}`, {
+          method: "PUT",
           body: JSON.stringify(this.employeeData),
           headers: {
             "Content-type": "application/json; charset=UTF-8",
           },
         });
         if (response.ok) {
-          this.listAddedMsg = "Employee Added Successfully";
-          this.employeeData = {
-            name: "",
-            username: "",
-            email: "",
-            phone: "",
-            website: "",
-          };
+          Router.go("/search");
         }
+        console.log("response", response);
       } catch (e) {
         console.log(e);
       }
@@ -114,7 +120,8 @@ export default class AddEmployee extends Authenticated {
   };
   navigateToEmployeeList(event) {
     event.preventDefault();
-    Router.go("/search");
+    console.log("Go back");
+    window.history.back();
   }
 
   validateForm() {
@@ -219,9 +226,9 @@ export default class AddEmployee extends Authenticated {
             <button
               class="add-employee-btn"
               id="add-btn"
-              @click="${(event) => this.handleSubmit(event)}"
+              @click="${(event) => this.handleSave(event)}"
             >
-              Add Employee
+              Save Employee
             </button>
             <button
               class="add-employee-btn"
@@ -229,17 +236,12 @@ export default class AddEmployee extends Authenticated {
               style="margin-left:10px;"
               @click="${(event) => this.navigateToEmployeeList(event)}"
             >
-              Go to Search
+              Go Back
             </button>
-          </div>
-          <div style="color:green">
-            ${this.listAddedMsg
-              ? html`<span>${this.listAddedMsg}</span>`
-              : html``}
           </div>
         </form>
       </div>
     `;
   }
 }
-customElements.define("add-employee", AddEmployee);
+customElements.define("edit-employee", EditEmployee);

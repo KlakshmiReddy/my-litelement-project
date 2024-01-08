@@ -2,6 +2,7 @@ import { html, css, LitElement } from "lit";
 export class HeaderEle extends LitElement {
   static styles = css`
     .header-container {
+      width:100%
       height: 50px;
       padding: 0px 20px;
       display: flex;
@@ -19,13 +20,22 @@ export class HeaderEle extends LitElement {
     }
   `;
 
-  static properties = {
-    name: { type: String },
-  };
+  static get properties() {
+    return {
+      name: { type: String },
+      user: { type: Object },
+    };
+  }
 
   constructor() {
     super();
-    this.name = "Header";
+    this.user = {};
+    this.getUser();
+    console.log(this.user);
+  }
+  getUser() {
+    const data = localStorage.getItem("user");
+    this.user = JSON.parse(data);
   }
   logoutFn() {
     localStorage.removeItem("token");
@@ -43,7 +53,8 @@ export class HeaderEle extends LitElement {
             />
           </a>
         </div>
-        <div class="logout">
+        <div class="logout" style="display:flex;align-items:center">
+          <p style="margin-right:20px">${this.user?.name}</p>
           <a href="#" @click="${this.logoutFn}"> Logout </a>
         </div>
       </div>

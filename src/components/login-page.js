@@ -30,6 +30,13 @@ export class LoginPage extends Authenticator1 {
       top: 35px;
       left: 4px;
     }
+    .invalid-msg {
+      position: absolute;
+      font-size: 12px;
+      color: red;
+      top: -10px;
+      left: 4px;
+    }
     .border-red {
       border: 1px solid red !important;
     }
@@ -42,15 +49,19 @@ export class LoginPage extends Authenticator1 {
       type: Object,
     },
     errors: { type: Object },
+    user: { type: Object },
+    invalid: { type: String },
   };
 
   constructor() {
     super();
+    this.user = {};
     this.employeeData = {
       email: "",
       password: "",
     };
     this.errors = {};
+    this.invalid = "";
   }
   handleFormData(event) {
     const { name, value } = event.target;
@@ -62,29 +73,39 @@ export class LoginPage extends Authenticator1 {
       ...this.errors,
       [name]: "",
     };
+    this.invalid = "";
   }
-  handleSubmit(event) {
+  handleSubmit = async (event) => {
     event.preventDefault();
     const isValid = this.validateForm();
     this.requestUpdate();
-    console.log("Before Validate", this.errors.email);
+    console.log(this.employeeData);
     if (isValid) {
-      // fetch("http://localhost:8080/springboot-jwt-login/login", {
-      //   method: "post",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(this.employeeData),
-      // })
-      //   .then((res) => res.json())
-      //   .then((res) => {
-      //     console.log(res);
-      //   });
-      localStorage.setItem("token", "abc");
-      history.replaceState(null, "", "/employee");
-      Router.go("/employee");
+      const res = await fetch(
+        `http://localhost:3000/auth?email=${this.employeeData.email}&&password=${this.employeeData.password}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const userData = await res.json();
+      this.user = userData[0];
+      console.log("user", this.user);
+      if (
+        this.user?.email === `${this.employeeData.email}` &&
+        this.user?.password === `${this.employeeData.password}`
+      ) {
+        localStorage.setItem("token", "abc");
+        localStorage.setItem("user", JSON.stringify(this.user));
+        history.replaceState(null, "", "/employee");
+        Router.go("/search");
+      } else {
+        this.invalid = "Invalid Credentials";
+      }
     }
-  }
+  };
   validateForm() {
     const { email, password } = this.employeeData;
     switch (true) {
@@ -131,6 +152,11 @@ export class LoginPage extends Authenticator1 {
             />
             ${this.errors.password
               ? html`<span class="error-msg">${this.errors.password}</span>`
+              : ""}
+          </div>
+          <div style="position:relative">
+            ${this.invalid
+              ? html`<span class="invalid-msg">${this.invalid}</span>`
               : ""}
           </div>
           <div style="margin-top:30px;">
